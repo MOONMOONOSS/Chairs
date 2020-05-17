@@ -103,16 +103,6 @@ public class Chairs extends JavaPlugin {
 			chairEffects.cancelPickup();
 	}
 
-	protected void loadSitDisabled() {
-		try {
-			for (final String line: Files.readAllLines(new File(getDataFolder(), "sit-disabled.txt").toPath())) {
-				try {
-					getPlayerSitData().disableSitting(UUID.fromString(line));
-				} catch (IllegalArgumentException e) {}
-			}
-		} catch (IOException e) {}
-	}
-
 	protected void saveSitDisabled() {
 		try {
 			final File sitDisabledFile = new File(getDataFolder(), "sit-disabled.txt");
