@@ -6,73 +6,61 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Stairs;
-import org.bukkit.block.data.type.Stairs.Shape;
-import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.entity.Player;
+import org.bukkit.block.data.type.Stairs;
+import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.data.type.Stairs.Shape;
 
 public class SitUtils {
-
 	protected final Chairs plugin;
 	protected final ChairsConfig config;
 	protected final PlayerSitData sitdata;
-	public SitUtils(Chairs plugin) {
+	public SitUtils(final Chairs plugin) {
 		this.plugin = plugin;
 		this.config = plugin.getChairsConfig();
 		this.sitdata = plugin.getPlayerSitData();
 	}
 
-	protected boolean canSitGeneric(Player player, Block block) {
+	protected boolean canSitGeneric(final Player player, final Block block) {
+		if (player.isSneaking())
+			return false;
+		if (!player.hasPermission("chairs.sit"))
+			return false;
 
-		if (player.isSneaking()) {
+		if (config.sitDisabledWorlds.contains(player.getWorld().getName()))
 			return false;
-		}
-		if (!player.hasPermission("chairs.sit")) {
+		if ((config.sitMaxDistance > 0) && (player.getLocation().distance(block.getLocation().add(0.5, 0, 0.5)) > config.sitMaxDistance))
 			return false;
-		}
+		if (config.sitRequireEmptyHand && (player.getInventory().getItemInMainHand().getType() != Material.AIR))
+			return false;
 
-		if (config.sitDisabledWorlds.contains(player.getWorld().getName())) {
+		if (sitdata.isSittingDisabled(player.getUniqueId()))
 			return false;
-		}
-		if ((config.sitMaxDistance > 0) && (player.getLocation().distance(block.getLocation().add(0.5, 0, 0.5)) > config.sitMaxDistance)) {
+		if (sitdata.isSitting(player))
 			return false;
-		}
-		if (config.sitRequireEmptyHand && (player.getInventory().getItemInMainHand().getType() != Material.AIR)) {
+		if (sitdata.isBlockOccupied(block))
 			return false;
-		}
-
-		if (sitdata.isSittingDisabled(player.getUniqueId())) {
-			return false;
-		}
-		if (sitdata.isSitting(player)) {
-			return false;
-		}
-		if (sitdata.isBlockOccupied(block)) {
-			return false;
-		}
 
 		return true;
 	}
 
-	public Location calculateSitLocation(Player player, Block block) {
-
-		if (!canSitGeneric(player, block)) {
+	public Location calculateSitLocation(final Player player, final Block block) {
+		if (!canSitGeneric(player, block))
 			return null;
-		}
 
-		BlockData blockdata = block.getBlockData();
+		final BlockData blockdata = block.getBlockData();
 		float yaw = player.getLocation().getYaw();
 		Double sitHeight = null;
 
 		if ((blockdata instanceof Stairs) && config.stairsEnabled) {
 			sitHeight = 0.5;
-			Stairs stairs = (Stairs) blockdata;
-			if (!isStairsSittable(stairs)) {
+			final Stairs stairs = (Stairs) blockdata;
+			if (!isStairsSittable(stairs))
 				return null;
-			}
-			BlockFace ascendingFacing = stairs.getFacing();
+
+			final BlockFace ascendingFacing = stairs.getFacing();
 			if (config.stairsAutoRotate) {
 				switch (ascendingFacing.getOppositeFace()) {
 					case NORTH: {
@@ -91,22 +79,20 @@ public class SitUtils {
 						yaw = 90;
 						break;
 					}
-					default: {
-					}
+					default: {}
 				}
 			}
 			if (config.stairsMaxWidth > 0) {
-				BlockFace facingLeft = rotL(ascendingFacing);
-				BlockFace facingRight = rotR(ascendingFacing);
-				int widthLeft = calculateStairsWidth(ascendingFacing, block, facingLeft, config.stairsMaxWidth);
-				int widthRight = calculateStairsWidth(ascendingFacing, block, facingRight, config.stairsMaxWidth);
-				if ((widthLeft + widthRight + 1) > config.stairsMaxWidth) {
+				final BlockFace facingLeft = rotL(ascendingFacing);
+				final BlockFace facingRight = rotR(ascendingFacing);
+				final int widthLeft = calculateStairsWidth(ascendingFacing, block, facingLeft, config.stairsMaxWidth);
+				final int widthRight = calculateStairsWidth(ascendingFacing, block, facingRight, config.stairsMaxWidth);
+				if ((widthLeft + widthRight + 1) > config.stairsMaxWidth)
 					return null;
-				}
 				if (config.stairsSpecialEndEnabled) {
 					boolean specialEndCheckSuccess = false;
-					Block blockLeft = block.getRelative(facingLeft, widthLeft + 1);
-					Block blockRight = block.getRelative(facingRight, widthRight + 1);
+					final Block blockLeft = block.getRelative(facingLeft, widthLeft + 1);
+					final Block blockRight = block.getRelative(facingRight, widthRight + 1);
 					if (
 						config.stairsSpecialEndSign &&
 						isStairsEndingSign(facingLeft, blockLeft) &&
@@ -125,55 +111,51 @@ public class SitUtils {
 					) {
 						specialEndCheckSuccess = true;
 					}
-					if (!specialEndCheckSuccess) {
+					if (!specialEndCheckSuccess)
 						return null;
-					}
 				}
 			}
 		}
 
 		if (sitHeight == null) {
 			sitHeight = config.additionalChairs.get(blockdata.getMaterial());
-			if (sitHeight == null) {
+			if (sitHeight == null)
 				return null;
-			}
 		}
 
-		Location plocation = block.getLocation();
+		final Location plocation = block.getLocation();
 		plocation.setYaw(yaw);
 		plocation.add(0.5D, (sitHeight - 0.5D), 0.5D);
 		return plocation;
 	}
 
-	protected static final boolean isStairsSittable(Stairs stairs) {
+	protected static final boolean isStairsSittable(final Stairs stairs) {
 		return (stairs.getHalf() == Half.BOTTOM) && (stairs.getShape() == Shape.STRAIGHT);
 	}
 
-	protected static boolean isStairsEndingSign(BlockFace expectedFacing, Block block) {
-		BlockData blockdata = block.getBlockData();
-		if (blockdata instanceof WallSign) {
+	protected static boolean isStairsEndingSign(final BlockFace expectedFacing, final Block block) {
+		final BlockData blockdata = block.getBlockData();
+		if (blockdata instanceof WallSign)
 			return expectedFacing == ((WallSign) blockdata).getFacing();
-		}
 		return false;
 	}
 
-	protected static boolean isStairsEndingCornerStairs(BlockFace expectedFacing, Stairs.Shape expectedShape, Block block) {
-		BlockData blockdata = block.getBlockData();
+	protected static boolean isStairsEndingCornerStairs(final BlockFace expectedFacing, final Stairs.Shape expectedShape, final Block block) {
+		final BlockData blockdata = block.getBlockData();
 		if (blockdata instanceof Stairs) {
-			Stairs stairs = (Stairs) blockdata;
+			final Stairs stairs = (Stairs) blockdata;
 			return (stairs.getHalf() == Half.BOTTOM) && (stairs.getFacing() == expectedFacing) && (stairs.getShape() == expectedShape);
 		}
 		return false;
 	}
 
-	protected int calculateStairsWidth(BlockFace expectedFace, Block block, BlockFace searchFace, int limit) {
+	protected int calculateStairsWidth(final BlockFace expectedFace, Block block, final BlockFace searchFace, final int limit) {
 		for (int i = 0; i < limit; i++) {
 			block = block.getRelative(searchFace);
 			BlockData blockdata = block.getBlockData();
-			if (!(blockdata instanceof Stairs)) {
+			if (!(blockdata instanceof Stairs))
 				return i;
-			}
-			Stairs stairs = (Stairs) blockdata;
+			final Stairs stairs = (Stairs) blockdata;
 			if (!isStairsSittable(stairs) || (stairs.getFacing() != expectedFace)) {
 				return i;
 			}
@@ -181,7 +163,7 @@ public class SitUtils {
 		return limit;
 	}
 
-	protected static BlockFace rotL(BlockFace face) {
+	protected static BlockFace rotL(final BlockFace face) {
 		switch (face) {
 			case NORTH: {
 				return BlockFace.WEST;
@@ -201,7 +183,7 @@ public class SitUtils {
 		}
 	}
 
-	protected static BlockFace rotR(BlockFace face) {
+	protected static BlockFace rotR(final BlockFace face) {
 		switch (face) {
 			case NORTH: {
 				return BlockFace.EAST;
@@ -220,34 +202,4 @@ public class SitUtils {
 			}
 		}
 	}
-
-//	private boolean checkFrame(Block block, BlockFace face, Player player) {
-//		// Go through the blocks next to the clicked block and check if are signs on the end.
-//
-//		for (int i = 1; i <= plugin.maxChairWidth + 2; i++) {
-//			Block relative = block.getRelative(face, i);
-//			if (checkDirection(block, relative)) {
-//				continue;
-//			}
-//			if (relative.getType().equals(Material.AIR)) {
-//				int x = relative.getLocation().getBlockX();
-//				int y = relative.getLocation().getBlockY();
-//				int z = relative.getLocation().getBlockZ();
-//				for (Entity e : player.getNearbyEntities(plugin.maxDistance, plugin.maxDistance, plugin.maxDistance)) {
-//					if (e instanceof ItemFrame && plugin.validSigns.contains(Material.ITEM_FRAME)) {
-//						int x2 = e.getLocation().getBlockX();
-//						int y2 = e.getLocation().getBlockY();
-//						int z2 = e.getLocation().getBlockZ();
-//						if (x == x2 && y == y2 && z == z2) {
-//							return true;
-//						}
-//					}
-//				}
-//				return false;
-//			} else {
-//				return false;
-//			}
-//		}
-//		return false;
-//	}
 }
