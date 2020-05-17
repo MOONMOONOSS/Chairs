@@ -25,7 +25,7 @@ jobs:
     - name: Create Jacoco Coverage report
       run: mvn jacoco:report
     - name: Codecov
-    - uses: codecov/codecov-action@v1.0.7
+      uses: codecov/codecov-action@v1.0.7
       with:
         # User defined upload name. Visible in Codecov UI
         name: MOONMOONOSS-Chairs
