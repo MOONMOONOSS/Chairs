@@ -14,13 +14,12 @@ import com.cnaude.chairs.core.ChairsConfig;
 import com.cnaude.chairs.core.PlayerSitData;
 
 public class ChairEffects {
-
 	protected final Chairs plugin;
 	protected final ChairsConfig config;
 	protected final PlayerSitData sitdata;
 	protected int healTaskID = -1;
 	protected int pickupTaskID = -1;
-	public ChairEffects(Chairs plugin) {
+	public ChairEffects(final Chairs plugin) {
 		this.plugin = plugin;
 		this.config = plugin.getChairsConfig();
 		this.sitdata = plugin.getPlayerSitData();
@@ -31,11 +30,11 @@ public class ChairEffects {
 			plugin,
 			() ->
 				Bukkit.getOnlinePlayers().stream()
-				.filter(p -> p.hasPermission("chairs.sit.health"))
+				.filter(final p -> p.hasPermission("chairs.sit.health"))
 				.filter(plugin.getPlayerSitData()::isSitting)
-				.forEach(p -> {
-					double health = p.getHealth();
-					double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
+				.forEach(final p -> {
+					final double health = p.getHealth();
+					final double maxHealth = p.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue();
 					if ((((health / maxHealth) * 100d) < config.effectsHealMaxHealth) && (health < maxHealth)) {
 						double newHealth = config.effectsHealHealthPerInterval + health;
 						if (newHealth > maxHealth) {
@@ -66,13 +65,13 @@ public class ChairEffects {
 			() ->
 				Bukkit.getOnlinePlayers().stream()
 				.filter(plugin.getPlayerSitData()::isSitting)
-				.forEach(p -> {
-					for (Entity entity : p.getNearbyEntities(1, 2, 1)) {
+				.forEach(final p -> {
+					for (final Entity entity : p.getNearbyEntities(1, 2, 1)) {
 						if (entity instanceof Item) {
-							Item item = (Item) entity;
+							final Item item = (Item) entity;
 							if (item.getPickupDelay() == 0) {
 								if (p.getInventory().firstEmpty() != -1) {
-									EntityPickupItemEvent pickupevent = new EntityPickupItemEvent(p, item, 0);
+									final EntityPickupItemEvent pickupevent = new final EntityPickupItemEvent(p, item, 0);
 									Bukkit.getPluginManager().callEvent(pickupevent);
 									if (!pickupevent.isCancelled()) {
 										p.getInventory().addItem(item.getItemStack());
@@ -81,24 +80,24 @@ public class ChairEffects {
 								}
 							}
 						} else if (entity instanceof ExperienceOrb) {
-							ExperienceOrb eorb = (ExperienceOrb) entity;
+							final ExperienceOrb eorb = (ExperienceOrb) entity;
 							int exptoadd = eorb.getExperience();
 							while (exptoadd > 0) {
 								int localexptoadd = 0;
 								if (p.getExpToLevel() < exptoadd) {
 									localexptoadd = p.getExpToLevel();
-									PlayerExpChangeEvent expchangeevent = new PlayerExpChangeEvent(p, localexptoadd);
+									final PlayerExpChangeEvent expchangeevent = new final PlayerExpChangeEvent(p, localexptoadd);
 									Bukkit.getPluginManager().callEvent(expchangeevent);
 									p.giveExp(expchangeevent.getAmount());
 									if (p.getExpToLevel() <= 0) {
-										PlayerLevelChangeEvent levelchangeevent = new PlayerLevelChangeEvent(p, p.getLevel(), p.getLevel()+1);
+										final PlayerLevelChangeEvent levelchangeevent = new final PlayerLevelChangeEvent(p, p.getLevel(), p.getLevel()+1);
 										Bukkit.getPluginManager().callEvent(levelchangeevent);
 										p.setExp(0);
 										p.giveExpLevels(1);
 									}
 								} else {
 									localexptoadd = exptoadd;
-									PlayerExpChangeEvent expchangeevent = new PlayerExpChangeEvent(p, localexptoadd);
+									final PlayerExpChangeEvent expchangeevent = new final PlayerExpChangeEvent(p, localexptoadd);
 									Bukkit.getPluginManager().callEvent(expchangeevent);
 									p.giveExp(expchangeevent.getAmount());
 								}
@@ -113,9 +112,8 @@ public class ChairEffects {
 	}
 
 	public void cancelPickup() {
-		if (pickupTaskID != -1) {
+		if (pickupTaskID != -1)
 			plugin.getServer().getScheduler().cancelTask(pickupTaskID);
-		}
 		pickupTaskID = -1;
 	}
 
@@ -123,5 +121,4 @@ public class ChairEffects {
 		cancelPickup();
 		startPickup();
 	}
-
 }

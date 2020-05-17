@@ -7,17 +7,17 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.PlayerEvent;
 
 public class PlayerChairUnsitEvent extends PlayerEvent implements Cancellable {
-
 	private static final HandlerList handlers = new HandlerList();
 	private boolean cancelled = false;
 
 	private boolean canbecancelled = true;
 	private Location unsitLocation;
 
-	public PlayerChairUnsitEvent(Player who, Location unsitLocation, boolean canbecancelled) {
-		super(who);
-		this.unsitLocation = unsitLocation;
-		this.canbecancelled = canbecancelled;
+	public PlayerChairUnsitEvent(final Player who, final Location unsitLocation, final boolean canbecancelled) {
+			super(who);
+
+			this.unsitLocation = unsitLocation;
+			this.canbecancelled = canbecancelled;
 	}
 
 	public boolean canBeCancelled() {
@@ -28,7 +28,7 @@ public class PlayerChairUnsitEvent extends PlayerEvent implements Cancellable {
 		return unsitLocation.clone();
 	}
 
-	public void setTeleportLocation(Location location) {
+	public void setTeleportLocation(final Location location) {
 		unsitLocation = location.clone();
 	}
 
@@ -47,8 +47,7 @@ public class PlayerChairUnsitEvent extends PlayerEvent implements Cancellable {
 	}
 
 	@Override
-	public void setCancelled(boolean cancelled) {
+	public void setCancelled(final boolean cancelled) {
 		this.cancelled = cancelled;
 	}
-
 }

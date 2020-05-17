@@ -24,8 +24,7 @@ import com.cnaude.chairs.sitaddons.ChairEffects;
 import com.cnaude.chairs.sitaddons.CommandRestrict;
 
 public class Chairs extends JavaPlugin {
-
-	private static Chairs instance;
+	private final static Chairs instance;
 
 	public static Chairs getInstance() {
 		return instance;
@@ -35,47 +34,47 @@ public class Chairs extends JavaPlugin {
 		instance = this;
 	}
 
-	public static Entity spawnChairsArrow(Location location) {
-		Arrow arrow = location.getWorld().spawnArrow(location, new Vector(), 0, 0);
+	public static Entity spawnChairsArrow(final Location location) {
+		final Arrow arrow = location.getWorld().spawnArrow(location, new final Vector(), 0, 0);
 		arrow.setGravity(false);
 		arrow.setInvulnerable(true);
 		arrow.setPickupStatus(PickupStatus.DISALLOWED);
+
 		return arrow;
 	}
 
-	private final ChairsConfig config = new ChairsConfig(this);
+	private final ChairsConfig config = new final ChairsConfig(this);
 	public ChairsConfig getChairsConfig() {
 		return config;
 	}
-	private final PlayerSitData psitdata = new PlayerSitData(this);
+	private final PlayerSitData psitdata = new final PlayerSitData(this);
 	public PlayerSitData getPlayerSitData() {
 		return psitdata;
 	}
 
 
-	public final ChairEffects chairEffects = new ChairEffects(this);
-	public final SitUtils utils = new SitUtils(this);
+	public final ChairEffects chairEffects = new final ChairEffects(this);
+	public final SitUtils utils = new final SitUtils(this);
 
 	@Override
 	public void onEnable() {
 		try {
-			Files.copy(Chairs.class.getClassLoader().getResourceAsStream("main/resources/config_help.txt"), new File(getDataFolder(), "main/resources/config_help.txt").toPath(), StandardCopyOption.REPLACE_EXISTING);
-		} catch (IOException e) {
-		}
+			Files.copy(Chairs.class.getClassLoader().getResourceAsStream("main/resources/config_help.txt"), new final File(getDataFolder(), "main/resources/config_help.txt").toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {}
+
 		reloadConfig();
-		getServer().getPluginManager().registerEvents(new NANLoginListener(), this);
-		getServer().getPluginManager().registerEvents(new TrySitEventListener(this), this);
-		getServer().getPluginManager().registerEvents(new TryUnsitEventListener(this), this);
-		getServer().getPluginManager().registerEvents(new CommandRestrict(this), this);
-		getCommand("chairs").setExecutor(new ChairsCommand(this));
+		getServer().getPluginManager().registerEvents(new final NANLoginListener(), this);
+		getServer().getPluginManager().registerEvents(new final TrySitEventListener(this), this);
+		getServer().getPluginManager().registerEvents(new final TryUnsitEventListener(this), this);
+		getServer().getPluginManager().registerEvents(new final CommandRestrict(this), this);
+		getCommand("chairs").setExecutor(new final ChairsCommand(this));
 	}
 
 	@Override
 	public void onDisable() {
-		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (psitdata.isSitting(player)) {
+		for (final Player player : Bukkit.getOnlinePlayers()) {
+			if (psitdata.isSitting(player))
 				psitdata.unsitPlayerForce(player, true);
-			}
 		}
 		chairEffects.cancelHealing();
 		chairEffects.cancelPickup();
@@ -85,44 +84,39 @@ public class Chairs extends JavaPlugin {
 	@Override
 	public void reloadConfig() {
 		config.reloadConfig();
-		if (config.effectsHealEnabled) {
+
+		if (config.effectsHealEnabled)
 			chairEffects.restartHealing();
-		} else {
+		else
 			chairEffects.cancelHealing();
-		}
-		if (config.effectsItemPickupEnabled) {
+
+		if (config.effectsItemPickupEnabled)
 			chairEffects.restartPickup();
-		} else {
+		else
 			chairEffects.cancelPickup();
-		}
 	}
 
 	protected void loadSitDisabled() {
 		try {
-			for (String line: Files.readAllLines(new File(getDataFolder(), "sit-disabled.txt").toPath())) {
+			for (final String line: Files.readAllLines(new final File(getDataFolder(), "sit-disabled.txt").toPath())) {
 				try {
 					getPlayerSitData().disableSitting(UUID.fromString(line));
-				} catch (IllegalArgumentException e) {
-				}
+				} catch (IllegalArgumentException e) {}
 			}
-		} catch (IOException e) {
-		}
+		} catch (IOException e) {}
 	}
 
 	protected void saveSitDisabled() {
 		try {
-			File sitDisabledFile = new File(getDataFolder(), "sit-disabled.txt");
-			if (!sitDisabledFile.exists()) {
+			final File sitDisabledFile = new final File(getDataFolder(), "sit-disabled.txt");
+			if (!sitDisabledFile.exists())
 				sitDisabledFile.createNewFile();
-			}
-			try (PrintWriter writer = new PrintWriter(sitDisabledFile, "UTF-8")) {
+			try (final PrintWriter writer = new final PrintWriter(sitDisabledFile, "UTF-8")) {
 				writer.println("# The following players disabled Chairs for themselves");
-				for (UUID uuid : getPlayerSitData().sitDisabled) {
+				for (final UUID uuid : getPlayerSitData().sitDisabled) {
 					writer.println(uuid.toString());
 				}
 			}
-		} catch (IOException e) {
-		}
+		} catch (IOException e) {}
 	}
-
 }

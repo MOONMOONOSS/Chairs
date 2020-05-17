@@ -13,22 +13,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import com.cnaude.chairs.core.Chairs;
 
 public class TrySitEventListener implements Listener {
-
 	protected final Chairs plugin;
-	public TrySitEventListener(Chairs plugin) {
+	public TrySitEventListener(final Chairs plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	public void onPlayerInteract(PlayerInteractEvent event) {
+	public void onPlayerInteract(final PlayerInteractEvent event) {
 		if ((event.getAction() == Action.RIGHT_CLICK_BLOCK) && (event.getHand() == EquipmentSlot.HAND)) {
-			Player player = event.getPlayer();
-			Block block = event.getClickedBlock();
-			Location sitLocation = plugin.utils.calculateSitLocation(player, block);
-			if ((sitLocation != null) && plugin.getPlayerSitData().sitPlayer(player, block, sitLocation)) {
+			final Player player = event.getPlayer();
+			final Block block = event.getClickedBlock();
+			final Location sitLocation = plugin.utils.calculateSitLocation(player, block);
+			if ((sitLocation != null) && plugin.getPlayerSitData().sitPlayer(player, block, sitLocation))
 				event.setCancelled(true);
-			}
 		}
 	}
-
 }
