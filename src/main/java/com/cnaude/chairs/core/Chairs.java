@@ -33,10 +33,12 @@ public class Chairs extends JavaPlugin {
 	}
 
 	public Chairs() {
+		super();
 		instance = this;
 	}
 
 	protected Chairs(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
+		super(loader, description, dataFolder, file);
 		instance = this;
 	}
 
@@ -64,7 +66,7 @@ public class Chairs extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		try {
-			Files.copy(Chairs.class.getClassLoader().getResourceAsStream("main/resources/config_help.txt"), new File(getDataFolder(), "main/resources/config_help.txt").toPath(), StandardCopyOption.REPLACE_EXISTING);
+			Files.copy(Chairs.class.getClassLoader().getResourceAsStream("config_help.txt"), new File(getDataFolder(), "config_help.txt").toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {}
 
 		reloadConfig();
