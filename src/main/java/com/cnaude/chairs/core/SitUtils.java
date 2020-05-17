@@ -6,12 +6,12 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.type.Stairs;
-import org.bukkit.block.data.type.Stairs.Shape;
-import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.entity.Player;
+import org.bukkit.block.data.type.Stairs;
+import org.bukkit.block.data.type.WallSign;
+import org.bukkit.block.data.type.Stairs.Shape;
 
 public class SitUtils {
 	protected final Chairs plugin;
@@ -149,10 +149,10 @@ public class SitUtils {
 		return false;
 	}
 
-	protected int calculateStairsWidth(final BlockFace expectedFace, final Block block, final BlockFace searchFace, final int limit) {
+	protected int calculateStairsWidth(final BlockFace expectedFace, Block block, final BlockFace searchFace, final int limit) {
 		for (int i = 0; i < limit; i++) {
 			block = block.getRelative(searchFace);
-			final BlockData blockdata = block.getBlockData();
+			BlockData blockdata = block.getBlockData();
 			if (!(blockdata instanceof Stairs))
 				return i;
 			final Stairs stairs = (Stairs) blockdata;

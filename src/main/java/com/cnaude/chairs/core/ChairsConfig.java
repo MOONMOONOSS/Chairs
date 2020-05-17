@@ -16,7 +16,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 public class ChairsConfig {
 	protected final Chairs plugin;
-	protected final ChairsConfig(Chairs plugin) {
+	protected ChairsConfig(Chairs plugin) {
 		this.plugin = plugin;
 	}
 
@@ -61,7 +61,7 @@ public class ChairsConfig {
 	protected static final String msgSitCommandRestrictedPath = "commandrestricted";
 
 
-	public final Set<String> sitDisabledWorlds = new final HashSet<>();
+	public final Set<String> sitDisabledWorlds = new HashSet<>();
 	public boolean sitRequireEmptyHand = false;
 	public double sitMaxDistance = 2;
 
@@ -72,7 +72,7 @@ public class ChairsConfig {
 	public boolean stairsSpecialEndSign = true;
 	public boolean stairsSpecialEndCornerStairs = true;
 
-	public final Map<Material, Double> additionalChairs = new final EnumMap<>(Material.class);
+	public final Map<Material, Double> additionalChairs = new EnumMap<>(Material.class);
 
 	public boolean effectsHealEnabled = false;
 	public int effectsHealMaxHealth = 100;
@@ -81,17 +81,17 @@ public class ChairsConfig {
 	public boolean effectsItemPickupEnabled = false;
 
 	public boolean restrictionsDisableAllCommands = false;
-	public final Set<String> restrictionsDisabledCommands = new final HashSet<>();
+	public final Set<String> restrictionsDisabledCommands = new HashSet<>();
 
 	public boolean msgEnabled = true;
-	public final String msgSitEnter = "&7You are now sitting.";
-	public final String msgSitLeave = "&7You are no longer sitting.";
-	public final String msgSitDisabled = "&7You have disabled chairs for yourself!";
-	public final String msgSitEnabled = "&7You have enabled chairs for yourself!";
-	public final String msgSitCommandRestricted = "&7You can't issue this command while sitting";
+	public String msgSitEnter = "&7You are now sitting.";
+	public String msgSitLeave = "&7You are no longer sitting.";
+	public String msgSitDisabled = "&7You have disabled chairs for yourself!";
+	public String msgSitEnabled = "&7You have enabled chairs for yourself!";
+	public String msgSitCommandRestricted = "&7You can't issue this command while sitting";
 
 	public void reloadConfig() {
-		final File file = new final File(plugin.getDataFolder(), "config.yml");
+		final File file = new File(plugin.getDataFolder(), "config.yml");
 
 		{
 			final FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -166,11 +166,11 @@ public class ChairsConfig {
 		}
 
 		{
-			final FileConfiguration config = new final YamlConfiguration();
+			final FileConfiguration config = new YamlConfiguration();
 
 			final ConfigurationSection sitConfigSection = config.createSection(sitConfigSectionPath);
 			{
-				sitConfigSection.set(sitConfigDisabledWorldsPath, new final ArrayList<>(sitDisabledWorlds));
+				sitConfigSection.set(sitConfigDisabledWorldsPath, new ArrayList<>(sitDisabledWorlds));
 				sitConfigSection.set(sitConfigRequireEmptyHandPath, sitRequireEmptyHand);
 
 				final ConfigurationSection sitConfigStairsSection = sitConfigSection.createSection(sitConfigStairsSectionPath);
@@ -187,7 +187,7 @@ public class ChairsConfig {
 
 				final ConfigurationSection sitConfigAdditionalBlocksSection = sitConfigSection.createSection(sitConfigAdditionalChairsPath);
 				{
-					for (final Entry<final Material, final Double> entry : additionalChairs.entrySet()) {
+					for (final Entry<Material, Double> entry : additionalChairs.entrySet()) {
 						sitConfigAdditionalBlocksSection.set(entry.getKey().toString(), entry.getValue());
 					}
 				}
@@ -214,7 +214,7 @@ public class ChairsConfig {
 				final ConfigurationSection sitRestrictionsCommandsSection = sitRestirctionsSection.createSection(sitRestricitonsCommandsSectionPath);
 				{
 					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsBlockAllPath, restrictionsDisableAllCommands);
-					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsBlockListPath, new final ArrayList<>(restrictionsDisabledCommands));
+					sitRestrictionsCommandsSection.set(sitRestrictionsCommandsBlockListPath, new ArrayList<>(restrictionsDisabledCommands));
 				}
 			}
 
